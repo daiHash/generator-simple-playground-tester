@@ -8,7 +8,7 @@ module.exports = class extends Generator {
     // Have Yeoman greet the user.
     this.log(
       yosay(
-        `Welcome to the super-excellent ${chalk.red(
+        `Welcome to the delightful ${chalk.red(
           'generator-simple-playground-tester'
         )} generator!`
       )
@@ -16,27 +16,34 @@ module.exports = class extends Generator {
 
     const prompts = [
       {
-        type: 'confirm',
-        name: 'someAnswer',
-        message: 'Would you like to enable this option?',
-        default: true
+        type: 'input',
+        name: 'name',
+        message: 'Please write your project name: ',
+        default: this.appname
       }
     ];
 
-    return this.prompt(prompts).then(props => {
+    return this.prompt(prompts).then(answer => {
       // To access props later use this.props.someAnswer;
-      this.props = props;
+      this.props = answer;
+      this.destinationRoot(answer.name);
     });
   }
 
   writing() {
-    this.fs.copy(
-      this.templatePath('dummyfile.txt'),
-      this.destinationPath('dummyfile.txt')
+    this.fs.copyTpl(
+      this.templatePath('package.json'),
+      this.destinationPath('package.json'),
+      {
+        name: this.props.name
+      }
     );
+    this.fs.copy(this.templatePath('index.html'), this.destinationPath('index.html'));
+    this.fs.copy(this.templatePath('style.css'), this.destinationPath('style.css'));
+    this.fs.copy(this.templatePath('scripts.js'), this.destinationPath('scripts.js'));
   }
 
   install() {
-    this.installDependencies();
+    this.npmInstall();
   }
 };
